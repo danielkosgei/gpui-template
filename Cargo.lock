@@ -2985,6 +2985,7 @@ name = "looji"
 version = "0.1.0"
 dependencies = [
  "gpui",
+ "windows 0.61.3",
 ]
 
 [[package]]

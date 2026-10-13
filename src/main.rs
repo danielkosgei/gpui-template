@@ -1,33 +1,32 @@
-use gpui::{prelude::*, *};
+// Release builds are GUI-only; debug builds keep a console for logs (same as Zed).
+#![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
-struct HelloWorld {
-    text: SharedString,
-}
+mod theme;
+mod title_bar;
+mod workspace;
 
-impl Render for HelloWorld {
-    fn render(&mut self, _window: &mut Window, _cx: &mut Context<Self>) -> impl IntoElement {
-        div()
-            .flex()
-            .flex_col()
-            .gap_3()
-            .bg(rgb(0x2e3440))
-            .size_full()
-            .justify_center()
-            .items_center()
-            .text_xl()
-            .text_color(rgb(0xeceff4))
-            .child(format!("Hello, {}!", &self.text))
-    }
-}
+use gpui::{App, Application};
+
+use workspace::Workspace;
+
+pub const APP_NAME: &str = "Looji";
 
 fn main() {
     Application::new().run(|cx: &mut App| {
-        cx.open_window(WindowOptions::default(), |_, cx| {
-            cx.new(|_| HelloWorld {
-                text: "World".into(),
-            })
-        })
-        .unwrap();
+        theme::init(cx);
+        quit_when_last_window_closes(cx);
+
+        Workspace::open_window(cx).expect("failed to open main window");
         cx.activate(true);
     });
+}
+
+/// Windows already exits when the last window closes; macOS and Linux don't.
+fn quit_when_last_window_closes(cx: &mut App) {
+    cx.on_window_closed(|cx| {
+        if cx.windows().is_empty() {
+            cx.quit();
+        }
+    })
+    .detach();
 }
