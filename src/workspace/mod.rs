@@ -3,18 +3,39 @@
 use gpui::{prelude::*, *};
 
 use crate::{
-    APP_NAME, theme::ActiveTheme, title_bar::TitleBar, window_frame::client_side_decorations,
+    APP_NAME,
+    theme::{self, ActiveTheme},
+    title_bar::TitleBar,
+    window_frame::{client_side_decorations, set_native_border_color},
 };
 
 const DEFAULT_WINDOW_SIZE: Size<Pixels> = size(px(1280.), px(800.));
 /// Same minimum as Zed, so the titlebar controls never overlap.
 const MIN_WINDOW_SIZE: Size<Pixels> = size(px(360.), px(240.));
 
-pub struct Workspace;
+pub struct Workspace {
+    _appearance_subscription: Subscription,
+}
 
 impl Workspace {
     pub fn open_window(cx: &mut App) -> Result<WindowHandle<Self>> {
-        cx.open_window(window_options(cx), |_, cx| cx.new(|_| Self))
+        cx.open_window(window_options(cx), |window, cx| {
+            set_native_border_color(window, cx);
+            cx.new(|cx| Self::new(window, cx))
+        })
+    }
+
+    fn new(window: &mut Window, cx: &mut Context<Self>) -> Self {
+        // Follow the system's light/dark setting while the app is running.
+        let _appearance_subscription = cx.observe_window_appearance(window, |_, window, cx| {
+            theme::sync_with_appearance(window.appearance(), cx);
+            set_native_border_color(window, cx);
+            cx.notify();
+        });
+
+        Self {
+            _appearance_subscription,
+        }
     }
 }
 
@@ -42,10 +63,10 @@ fn window_options(cx: &App) -> WindowOptions {
 /// Prefer the desktop's own frame (KDE, wlroots, X11 window managers).
 /// Compositors without xdg-decoration support, like GNOME, fall back to
 /// client-side, which `client_side_decorations` and `TitleBar` handle.
-/// Set `LOOJI_WINDOW_DECORATIONS=client` to force our own frame, the
+/// Set `GPUI_TEMPLATE_WINDOW_DECORATIONS=client` to force our own frame, the
 /// counterpart of Zed's `ZED_WINDOW_DECORATIONS`.
 fn window_decorations() -> WindowDecorations {
-    match std::env::var("LOOJI_WINDOW_DECORATIONS").as_deref() {
+    match std::env::var("GPUI_TEMPLATE_WINDOW_DECORATIONS").as_deref() {
         Ok("client") => WindowDecorations::Client,
         _ => WindowDecorations::Server,
     }

@@ -10,7 +10,7 @@ use gpui::{App, Application};
 
 use workspace::Workspace;
 
-pub const APP_NAME: &str = "Looji";
+pub const APP_NAME: &str = "gpui-template";
 
 fn main() {
     Application::new().run(|cx: &mut App| {
