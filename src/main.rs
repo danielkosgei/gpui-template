@@ -3,6 +3,7 @@
 
 mod theme;
 mod title_bar;
+mod window_frame;
 mod workspace;
 
 use gpui::{App, Application};

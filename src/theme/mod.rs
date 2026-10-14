@@ -10,6 +10,7 @@ pub struct Theme {
     pub title_bar_background: Hsla,
     pub title_bar_inactive_background: Hsla,
     pub editor_background: Hsla,
+    pub border: Hsla,
     pub text: Hsla,
     pub ghost_element_hover: Hsla,
     pub ghost_element_active: Hsla,
