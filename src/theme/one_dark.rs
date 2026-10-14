@@ -4,6 +4,7 @@ use super::Theme;
 
 impl Theme {
     /// Zed's default "One Dark" theme (assets/themes/one/one.json).
+    #[allow(dead_code)] // Alternative to the default; swap it in via `theme::init`.
     pub fn one_dark() -> Self {
         Self {
             title_bar_background: rgb(0x3b414d).into(),

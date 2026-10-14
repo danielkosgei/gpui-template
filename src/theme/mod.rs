@@ -2,6 +2,7 @@
 //!
 //! To add a theme, create a file next to `one_dark.rs` with its own constructor.
 
+mod gruvbox_dark_hard;
 mod one_dark;
 
 use gpui::{App, Global, Hsla};
@@ -19,7 +20,7 @@ pub struct Theme {
 impl Global for Theme {}
 
 pub fn init(cx: &mut App) {
-    cx.set_global(Theme::one_dark());
+    cx.set_global(Theme::gruvbox_dark_hard());
 }
 
 pub trait ActiveTheme {
