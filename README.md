@@ -21,15 +21,8 @@
 
 ## Features
 
-- **Custom titlebar** modeled on Zed's, with the app icon, title and window controls drawn by the app.
-  - **Windows:** native caption buttons, snapping and drag via Windows hit-testing.
-  - **Linux (Wayland and X11):** uses the desktop's own frame when available, otherwise draws
-    client-side decorations with rounded corners, a shadow and resize handles.
-- **Gruvbox themes that follow the system.** Gruvbox Dark Hard in dark mode, Gruvbox Light Hard in
-  light mode, switching live when the system setting changes. On Windows 11 the window outline is
-  tinted to match.
-- **App icon** embedded in the Windows executable (taskbar, Alt+Tab, Explorer) and shown in the
-  titlebar.
+- **Custom titlebar** with the app icon, title and window controls, on Windows, Linux (Wayland and X11).
+- **Gruvbox light and dark themes** that follow the system setting.
 
 ## Getting started
 
