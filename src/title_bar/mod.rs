@@ -4,6 +4,8 @@
 mod client_controls;
 mod window_controls;
 
+use std::sync::{Arc, LazyLock};
+
 use gpui::{prelude::*, *};
 
 use crate::theme::ActiveTheme;
@@ -12,6 +14,15 @@ use window_controls::WindowsWindowControls;
 
 /// Zed hard-codes 32px on Windows to match the native caption height.
 const TITLE_BAR_HEIGHT: Pixels = px(32.);
+const APP_ICON_SIZE: Pixels = px(16.);
+
+/// 32px so the 16px icon stays sharp up to 200% display scaling.
+static APP_ICON: LazyLock<Arc<Image>> = LazyLock::new(|| {
+    Arc::new(Image::from_bytes(
+        ImageFormat::Png,
+        include_bytes!("../../assets/icons/app-icon-32.png").to_vec(),
+    ))
+});
 
 #[derive(IntoElement)]
 pub struct TitleBar {
@@ -51,7 +62,15 @@ impl RenderOnce for TitleBar {
             .h(TITLE_BAR_HEIGHT)
             .pl_2()
             .bg(background)
-            .child(div().text_sm().child(self.title));
+            .child(
+                div()
+                    .flex()
+                    .flex_row()
+                    .items_center()
+                    .gap_2()
+                    .child(img(APP_ICON.clone()).size(APP_ICON_SIZE).flex_none())
+                    .child(div().text_sm().child(self.title)),
+            );
 
         if cfg!(target_os = "windows") {
             // Windows handles dragging, snapping, and double-click to

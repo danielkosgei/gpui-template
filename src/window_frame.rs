@@ -110,6 +110,41 @@ pub fn client_side_decorations(
         )
 }
 
+/// Windows 11 outlines every window in the system accent color; paint that
+/// outline with the theme's border instead. Windows 10 ignores this.
+#[cfg(target_os = "windows")]
+pub fn set_native_border_color(window: &Window, cx: &App) {
+    use raw_window_handle::{HasWindowHandle, RawWindowHandle};
+    use windows::Win32::{
+        Foundation::{COLORREF, HWND},
+        Graphics::Dwm::{DWMWA_BORDER_COLOR, DwmSetWindowAttribute},
+    };
+
+    let Ok(handle) = HasWindowHandle::window_handle(window) else {
+        return;
+    };
+    let RawWindowHandle::Win32(handle) = handle.as_raw() else {
+        return;
+    };
+
+    let color = Rgba::from(cx.theme().border);
+    let to_byte = |channel: f32| (channel * 255.).round() as u32;
+    // COLORREF is 0x00BBGGRR.
+    let color = COLORREF(to_byte(color.r) | to_byte(color.g) << 8 | to_byte(color.b) << 16);
+
+    unsafe {
+        let _ = DwmSetWindowAttribute(
+            HWND(handle.hwnd.get() as _),
+            DWMWA_BORDER_COLOR,
+            &color as *const _ as _,
+            std::mem::size_of::<COLORREF>() as u32,
+        );
+    }
+}
+
+#[cfg(not(target_os = "windows"))]
+pub fn set_native_border_color(_window: &Window, _cx: &App) {}
+
 fn cursor_for(edge: ResizeEdge) -> CursorStyle {
     match edge {
         ResizeEdge::Top | ResizeEdge::Bottom => CursorStyle::ResizeUpDown,
